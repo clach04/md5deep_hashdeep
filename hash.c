@@ -1,62 +1,39 @@
 
-/* MD5DEEP
- *
- * By Jesse Kornblum
- *
- * This is a work of the US Government. In accordance with 17 USC 105,
- * copyright protection is not available for any work of the US Government.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- */
-
 #include "md5deep.h"
 
 void updateDisplay(time_t elapsed,   off_t bytesRead, 
 		   off_t totalBytes, char *file_name) 
 {
-  char msg[LINE_LENGTH];
   unsigned int hour,min;
   off_t remaining, 
     mb_read    = bytesRead  / ONE_MEGABYTE,
     total_megs = totalBytes / ONE_MEGABYTE;
-
+  
   /* If we couldn't compute the input file size, punt */
   if (total_megs == 0) 
   {
-    /* Because the length of this style of line is guarenteed
-       only to increase, we don't worry about erasing anything 
-       already on the line. Thus, we don't need the trailing 
-       SPACE that's used for true time estimates below. */
-    snprintf(msg,LINE_LENGTH,
-	     "%s: %lluMB done. Unable to estimate remaining time.",
-	     file_name,mb_read);
+    fprintf(stderr,
+	    "\r%s: %lluMB done. Unable to estimate remaining time.",
+	    file_name,mb_read);
+    return;
   }
-  else 
-  {
   
-    /* Our estimate of the number of seconds remaining */
-    remaining = (off_t)floor(((double)total_megs/mb_read - 1) * elapsed);
+  /* Our estimate of the number of seconds remaining */
+  remaining = (off_t)floor(((double)total_megs/mb_read - 1) * elapsed);
 
-    /* We don't care if the remaining time is more than one day.
-       If you're hashing something that big, to quote the movie Jaws:
-       
-              "We're gonna need a bigger boat."                   */
-    
-    hour = floor((double)remaining/3600);
-    remaining -= (hour * 3600);
-    
-    min = floor((double)remaining/60);
-    remaining -= min * 60;
-    
-    snprintf(msg,LINE_LENGTH,
-	     "%s: %lluMB of %lluMB done, %02u:%02u:%02llu left%s",
-	     file_name,mb_read,total_megs,hour,min,remaining,BLANK_LINE);
-  }    
+  /* We don't care if the remaining time is more than one day.
+     If you're hashing something that big, to quote the movie Jaws:
+     
+                   "We're gonna need a bigger boat."                   */
 
-  fprintf(stderr,"\r%s",msg);
+  hour = floor((double)remaining/3600);
+  remaining -= (hour * 3600);
+  
+  min = floor((double)remaining/60);
+  remaining -= min * 60;
+  
+  fprintf(stderr,"\r%s: %lluMB of %lluMB done, %02u:%02u:%02llu left",
+	  file_name,mb_read,total_megs,hour,min,remaining);
 }
 
 
@@ -67,31 +44,15 @@ int fatal_error()
 	  errno == EIO);       /* Input/Output error */
 }
 
-void shorten_filename(char *dest, char *src)
-{
-  char *temp;
-
-  if (strlen(src) < MAX_FILENAME_LENGTH)
-    /* Technically we could use strcpy and not strncpy, but it's good
-       practice to ALWAYS use strncpy! */
-    strncpy(dest,src,MAX_FILENAME_LENGTH);
-  else
-  {
-    temp = strdup(src);
-    temp[MAX_FILENAME_LENGTH - 3] = 0;
-    sprintf(dest,"%s...",temp);
-    free(temp);
-  }
-}
 
 /* Returns TRUE if the file reads successfully, FALSE on failure */
-int compute_hash(off_t mode, FILE *fp, char *file_name, char *short_name,
-		 off_t file_size, int estimate_time, HASH_CONTEXT *md)
+int compute_md5(off_t mode, FILE *fp, char *file_name, off_t file_size, 
+		int estimate_time, MD5_CTX *md)
 {
   time_t start_time,current_time,last_time = 0;
   off_t position = 0, bytes_read;
   unsigned char buffer[BUFSIZ];
-
+  
   if (estimate_time)
   {
     time(&start_time);
@@ -109,16 +70,14 @@ int compute_hash(off_t mode, FILE *fp, char *file_name, char *short_name,
     if (ferror(fp))
     {
       if (!(M_SILENT(mode)))
-	fprintf(stderr,"%s: %s: error at offset %llu: %s%s", 
-		__progname,file_name,position,strerror(errno),NEWLINE);
+	fprintf(stderr,"%s: %s: error at offset %llu: %s\n", 
+		__progname,file_name,position,strerror(errno));
       
-      HASH_Update(md, buffer, BUFSIZ);
+      MD5Update(md, buffer, BUFSIZ);
       position += BUFSIZ;
       
       if (fatal_error())
-      {
 	return FALSE;
-      }
 
       clearerr(fp);
       
@@ -129,7 +88,7 @@ int compute_hash(off_t mode, FILE *fp, char *file_name, char *short_name,
     else
     {
       /* If we hit the end of the file, we read less than BUFSIZ bytes! */
-      HASH_Update(md, buffer, bytes_read);
+      MD5Update(md, buffer, bytes_read);
       position += bytes_read;
     }
 
@@ -138,8 +97,7 @@ int compute_hash(off_t mode, FILE *fp, char *file_name, char *short_name,
     {	
       /* If we've been printing, we now need to clear the line. */
       if (estimate_time)   
-	fprintf(stderr,"\r%s\r",BLANK_LINE);
-
+	fprintf(stderr,"\r                                                                        \r"); 
       return TRUE;
     }
     
@@ -149,55 +107,54 @@ int compute_hash(off_t mode, FILE *fp, char *file_name, char *short_name,
       /* We only update the display only if a full second has elapsed */
       if (last_time != current_time) {
 	last_time = current_time;
-	updateDisplay((current_time-start_time),position,file_size,short_name);
+	updateDisplay((current_time-start_time),position,file_size,file_name);
       }
     }
   }      
 }
 
-
-
-
-char *hash_file(off_t mode, FILE *fp, char *file_name) 
+char *md5_file(off_t mode, FILE *fp, char *file_name) 
 {
   off_t file_size = 0;
-  HASH_CONTEXT md;
-  unsigned char sum[HASH_LENGTH];
-  static char result[2 * HASH_LENGTH + 1];
+  MD5_CTX md;
+  unsigned char sum[MD5_HASH_LENGTH];
+  static char result[2 * MD5_HASH_LENGTH + 1];
   static char hex[] = "0123456789abcdef";
-  int i, status;
-  char *temp, *basen = strdup(file_name),
-    *short_name = (char *)malloc(sizeof(char) * PATH_MAX);
-
+  int i, estimate_time = FALSE;
+  
   if (M_ESTIMATE(mode))
   {
     file_size = find_file_size(fp);
-    temp = basename(basen);
-    shorten_filename(short_name,temp);
-  }    
+    
+    /* If were are unable to compute the file size, we can't very well
+       estimate how long it's going to take us, now can we! That being
+       said, we don't want to change the global variable in case there
+       are other files later on that we can compute estimates for. */
+    if (file_size != 0) 
+    {
+      estimate_time = TRUE;
+      file_name = basename(file_name);
+    }
+  }
 
-  HASH_Init(&md);
-  status = compute_hash(mode,fp,file_name,short_name,file_size,
-			M_ESTIMATE(mode),&md);
-  free(short_name);
-  if (!status)
+  MD5Init(&md);
+  if (!compute_md5(mode,fp,file_name,file_size,estimate_time,&md))
     return NULL;
-
-  HASH_Final(sum, &md);
+  MD5Final(sum, &md);
   
-  for (i = 0; i < HASH_LENGTH; i++) {
+  for (i = 0; i < MD5_HASH_LENGTH; i++) {
     result[2 * i] = hex[(sum[i] >> 4) & 0xf];
     result[2 * i + 1] = hex[sum[i] & 0xf];
   }
-
-  return result;
+  return (result);
 }
 
-void hash(off_t mode, char *file_name) 
+
+void md5(off_t mode, char *file_name) 
 {
+  int result;
+  char *hash;
   FILE *handle;
-  int status; 
-  char *result;
 
   if ((handle = fopen(file_name,"rb")) == NULL) 
   {
@@ -205,55 +162,26 @@ void hash(off_t mode, char *file_name)
     return;
   }
 
-  if ((result = hash_file(mode,handle,file_name)) != NULL)
+  if ((hash = md5_file(mode,handle,file_name)) != NULL)
   {
     if (M_MATCH(mode) || M_MATCHNEG(mode))
     {
-      status = is_known_hash(result);
-      if ((status && M_MATCH(mode)) || (!status && M_MATCHNEG(mode)))
+      result = is_known_hash(hash);
+      if ((result && M_MATCH(mode)) || (!result && M_MATCHNEG(mode)))
       {
 	if (M_DISPLAY_HASH(mode))
 	{
-	  printf ("%s  ", result);
+	  printf ("%s  ", hash);
 	}
-	printf ("%s%s", file_name,NEWLINE);
+	printf ("%s\n", file_name);
       }
     }
     else 
     {
-      printf("%s  %s%s",result,file_name,NEWLINE);
+      printf("%s  %s\n",hash,file_name);
     }
   }
 
   fclose(handle);
-}
-
-/* Yes, this LOOKS LIKE it repeats some of the above code, but we are
-   really displaying very different things. Don't try to combine this
-   function with hash() above. */
-void hash_stdin(off_t mode)
-{
-  char *result;
-  int status;
-  
-  if ((result = hash_file(mode,stdin,"STDIN")) != NULL)
-  {
-    if (M_MATCH(mode) || M_MATCHNEG(mode))
-    {
-      status = is_known_hash(result);
-      if ((status && M_MATCH(mode)) || (!status && M_MATCHNEG(mode)))
-      {
-	if (M_DISPLAY_HASH(mode))
-	{
-	  printf ("%s  ", result);
-	}
-	printf ("stdin matches%s", NEWLINE);
-      }
-    }
-    else 
-    {
-      printf("%s%s",result,NEWLINE);
-    }
-  }
 }
 
