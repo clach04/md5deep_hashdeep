@@ -17,55 +17,46 @@
 #include "hashTable.h"
 
 hashTable knownHashes;
-int table_initialized = FALSE;
+bool tableInitialized = FALSE;
 
-int load_match_file(off_t mode, char *fn) {
+int loadMatchFile(char *filename) {
 
-  off_t line_number = 0;
+  unsigned long lineNumber = 0;
   char buf[MAX_STRING_LENGTH + 1];
-  int file_type;
+  int fileType;
   FILE *f;
 
   /* We only need to initialize the table the first time through here.
      Otherwise, we'd erase all of the previous entries! */
-  if (!table_initialized) 
-  {
+  if (!tableInitialized) {
     hashTableInit(&knownHashes);
-    table_initialized = TRUE;
+    tableInitialized = TRUE;
   }
 
-  if ((f = fopen(fn,"r")) == NULL) 
-  {
-    print_error(mode,fn,strerror(errno));
+  if ((f = fopen(filename,"r")) == NULL) {
+    printError(filename);
     return FALSE;
   }
 
-  file_type = hash_file_type(f);
-  if (file_type == TYPE_UNKNOWN)
-  {
-    print_error(mode,fn,"Unable to find hashes in file, skipped.");
-    return FALSE;
-  }
-
+  fileType = determineFileType(f);
+  
   /* We skip the first line in every file type except plain files. 
      All other file types have a header line that we need to ignore. */
-  if (file_type == TYPE_PLAIN) 
-    rewind(f);
+  if (fileType != TYPE_PLAIN) 
+    lineNumber++;
   else 
-    line_number++;
+    rewind(f);
   
   while (fgets(buf,MAX_STRING_LENGTH,f)) {
 
-    ++line_number;
+    lineNumber++;
 
-    if (find_hash_in_line(buf,file_type) != TRUE) 
-    {
+    if (findHashValueinLine(buf,fileType) != TRUE) {
 
-      if (!(M_SILENT(mode)))
-      {
-	fprintf(stderr,"%s: %s: WARNING: No hash found in line %llu\n", 
-		__progname,fn,line_number);
-      }
+      fprintf(stderr,"%s: %s: Improperly formatted file at line %ld\n",
+	      __progname,filename,lineNumber);
+      fprintf(stderr,"The offending line was:\n%s\n", buf);
+      return FALSE;
 
     } else {
 
@@ -85,7 +76,7 @@ int load_match_file(off_t mode, char *fn) {
 
 
 
-int is_known_hash(char *h) {
+int isKnownHash(char *h) {
   return (hashTableContains(&knownHashes,h));
 }
 
