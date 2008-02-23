@@ -1,0 +1,93 @@
+
+Version 1.3 - 25 May 04
+
+- Windows version can process physical devices like
+  \\.\PhysicalDrive0 and \\.\tape0
+- Removed halting on fatal errors except "Permission Denied"
+- Added error checking for cycles created by symbolic links
+- Added -z flag to print file sizes
+- Added -0 flag to end lines with /0 instead of newlines
+- Updated documentation regarding md5deep and Cygwin
+- Cleaned up Makefile, fixed support for native "make windows"
+
+
+Version 1.2 - 16 Apr 04
+
+- Added sha1deep to compute SHA-1 hashes
+- Abstracted hash functions to allow other algorithms to be inserted
+- Windows version now generates output with line feeds AND carriage returns
+- Fixed printing of error messages for positive and negative matching together
+- Cleaned up display for matching of standard input
+
+
+Version 1.1 - 25 Mar 04
+
+- Fixed processing of standard input on Windows
+- Fixed cosmetic errors with time estimation to now produce a fixed length
+   output and avoid spanning multiple lines
+
+
+Version 1.0 - 15 Mar 04
+(better late than never!)
+
+- Moved hierarchy traversal code into separate file, dig.c
+- Now able to handle symbolic links properly
+- If no input files are given, uses standard input
+- Added file read error handling (display an error message, pad missing data
+  with zeros and continue execution).
+- Added expert mode; allows user to choose which and only which types of
+  files are processed
+- Added -X and -M to print hashes as well as matches
+- Errors in files of known hashes are now treated an non-fatal
+- When estimating completion time, print the filename being processed
+- Corrected NSRL import code
+- Cleaned up time estimation calculation
+- Fixed block device time estimation for *BSD
+- Switched from unsigned long long to off_t type
+- Fixed duplicate slashes in filenames from root directory (e.g. //usr/src)
+- Fixed install process. Generally this meant removing flags from
+  the install command.
+- Added *BSD-specific includes
+- Fixed minor data type issue for Gentoo linux
+- Fixed typos in copyright and error messages
+
+
+Version 0.16 - 7 Mar 03
+
+Added -x flag for negative matching
+Made the Makefile nicer
+Added code for compatibility with FreeBSD, Solaris, and OS X.
+Added support for symbolic links to files
+Changed the rules for a valid plain hash such that it only needs to
+be followed by one space instead of two
+
+
+Version 0.15 - 5 Jan 03
+
+Added -m flag for matching support
+Made the help message more helpful
+
+
+Version 0.14 - 2 Dec 02:
+
+Added better checks for avoiding symbolic links on *nix
+Fixed time estimation for block devices on Linux
+Added -V flag for copyright information
+Program now identifies itself correctly in Windows error messages.
+
+
+Version 0.13 - 7 Nov 02:
+
+Added -r and -e flags for recursion and time estimation, respectively.
+Fixed Windows version to generate correct MD5 values. 
+ (u_int_32 should have been unsigned long instead of long. Oops.)
+
+
+Version 0.12 - 1 Nov 02:
+
+First version released to "public"
+Removed linux specific code
+Added -b and -t flags switches for compatibility with md5sum
+Cleaned up README and man page
+
+
