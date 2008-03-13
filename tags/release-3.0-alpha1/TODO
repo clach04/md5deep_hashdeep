@@ -1,0 +1,4 @@
+*** Add support for hashdeep to use NSRL files and other types?
+
+*** Add 'make test' directive to run compiled programs on test files 
+    and ensure compilation was successful. 
