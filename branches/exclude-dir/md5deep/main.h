@@ -65,7 +65,11 @@ typedef struct _state {
   time_t        timestamp;
 #endif
   char          * time_str;
-  
+ 
+  /* File systems */
+  dev_t         base_fs;
+  dev_t         curr_fs;
+
   /* Lists of known hashes */
   int           hashes_loaded;
   hashTable     known_hashes;

@@ -262,9 +262,11 @@ memset(VAR,0,SIZE * sizeof(TYPE));
 #define mode_size_all          1<<20
 #define mode_timestamp         1<<21
 #define mode_csv               1<<22
+#define mode_excludes          1<<23
+#define mode_single_fs         1<<24
 
 
-// Modes 23-48 are reserved for future use.
+// Modes 25-48 are reserved for future use.
 //
 // Note that the LL is required to avoid overflows of 32-bit words.
 // LL must be used for any value equal to or above 1<<31. 
@@ -333,6 +335,12 @@ typedef struct _state state;
 int have_processed_dir(TCHAR *fn);
 int processing_dir(TCHAR *fn);
 int done_processing_dir(TCHAR *fn);
+
+// ----------------------------------------------------------------
+// EXCLUDE FUNCTIONS
+// ----------------------------------------------------------------
+void add_exclude_dir(state *s, char *fn);
+int exclude_dir(TCHAR *fn);
 
 // ------------------------------------------------------------------
 // HELPER FUNCTIONS

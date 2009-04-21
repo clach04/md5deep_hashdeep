@@ -384,6 +384,12 @@ static int process_dir(state *s, TCHAR *fn)
 
   //  print_status (_TEXT("Called process_dir(%s)"), fn);
 
+  if (exclude_dir(fn))
+    return STATUS_OK;
+
+  if ((s->mode & mode_single_fs) && (s->curr_fs != s->base_fs))
+    return STATUS_OK;
+
   if (have_processed_dir(fn))
   {
     print_error_unicode(s,fn,"symlink creates cycle");
@@ -479,6 +485,10 @@ static int file_type(state *s, TCHAR *fn)
     return stat_unknown;
   }
 
+  if (s->base_fs == 0)
+    s->base_fs = sb.st_dev;
+
+  s->curr_fs = sb.st_dev;
   s->total_bytes = sb.st_size;
 
   // On Win32 this should be the creation time, but on all other systems

@@ -7,6 +7,7 @@ COMMON_SRC = \
 ${COMMON_DIR}/hash.c     \
 ${COMMON_DIR}/dig.c      \
 ${COMMON_DIR}/cycles.c   \
+${COMMON_DIR}/exclude.c  \
 ${COMMON_DIR}/ui.c       \
 ${COMMON_DIR}/helpers.c  \
 ${COMMON_DIR}/md5.c      \

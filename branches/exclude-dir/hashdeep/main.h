@@ -184,6 +184,10 @@ struct _state {
   uint64_t        total_megs;
   time_t          timestamp;
 
+  /* File systems */
+  dev_t           base_fs;
+  dev_t           curr_fs;
+
   // We don't want to use s->total_bytes but it is
   // required for hash.c
   uint64_t        total_bytes;

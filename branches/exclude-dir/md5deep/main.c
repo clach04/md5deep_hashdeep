@@ -130,7 +130,7 @@ static int process_command_line(state *s, int argc, char **argv)
   
   while ((i = getopt(argc,
 		     argv,
-		     "I:i:M:X:x:m:o:A:a:tnwczsSp:erhvV0lbkqU")) != -1) { 
+		     "I:i:M:X:x:m:d:o:A:a:tnwczsSp:efrhvV0lbkqU")) != -1) { 
     switch (i) {
 
     case 'I':
@@ -218,6 +218,11 @@ static int process_command_line(state *s, int argc, char **argv)
 	s->hashes_loaded = TRUE;
       break;
 
+    case 'd':
+      add_exclude_dir(s,optarg);
+      s->mode |= mode_excludes;
+      break;
+
     case 'c':
       s->mode |= mode_csv;
       break;
@@ -241,6 +246,10 @@ static int process_command_line(state *s, int argc, char **argv)
 
     case 'e':
       s->mode |= mode_estimate;
+      break;
+
+    case 'f':
+      s->mode |= mode_single_fs;
       break;
 
     case 'r':
@@ -381,6 +390,7 @@ int main(int argc, char **argv)
     while (count < s->argc)
     {  
       generate_filename(s,fn,cwd,s->argv[count]);
+      s->base_fs = 0;
 
 #ifdef _WIN32
       status = process_win32(s,fn);
