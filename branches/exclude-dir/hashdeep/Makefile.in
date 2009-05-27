@@ -46,8 +46,9 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am__objects_1 = hash.$(OBJEXT) dig.$(OBJEXT) cycles.$(OBJEXT) \
-	ui.$(OBJEXT) helpers.$(OBJEXT) md5.$(OBJEXT) sha1.$(OBJEXT) \
-	sha256.$(OBJEXT) tiger.$(OBJEXT) whirlpool.$(OBJEXT)
+	exclude.$(OBJEXT) ui.$(OBJEXT) helpers.$(OBJEXT) md5.$(OBJEXT) \
+	sha1.$(OBJEXT) sha256.$(OBJEXT) tiger.$(OBJEXT) \
+	whirlpool.$(OBJEXT)
 am_hashdeep_OBJECTS = main.$(OBJEXT) audit.$(OBJEXT) match.$(OBJEXT) \
 	multihash.$(OBJEXT) display.$(OBJEXT) hashtable.$(OBJEXT) \
 	$(am__objects_1)
@@ -168,6 +169,7 @@ COMMON_SRC = \
 ${COMMON_DIR}/hash.c     \
 ${COMMON_DIR}/dig.c      \
 ${COMMON_DIR}/cycles.c   \
+${COMMON_DIR}/exclude.c  \
 ${COMMON_DIR}/ui.c       \
 ${COMMON_DIR}/helpers.c  \
 ${COMMON_DIR}/md5.c      \
@@ -259,6 +261,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cycles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/display.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/exclude.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hash.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashtable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/helpers.Po@am__quote@
@@ -328,6 +331,20 @@ cycles.obj: ${COMMON_DIR}/cycles.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='${COMMON_DIR}/cycles.c' object='cycles.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cycles.obj `if test -f '${COMMON_DIR}/cycles.c'; then $(CYGPATH_W) '${COMMON_DIR}/cycles.c'; else $(CYGPATH_W) '$(srcdir)/${COMMON_DIR}/cycles.c'; fi`
+
+exclude.o: ${COMMON_DIR}/exclude.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT exclude.o -MD -MP -MF $(DEPDIR)/exclude.Tpo -c -o exclude.o `test -f '${COMMON_DIR}/exclude.c' || echo '$(srcdir)/'`${COMMON_DIR}/exclude.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/exclude.Tpo $(DEPDIR)/exclude.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='${COMMON_DIR}/exclude.c' object='exclude.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o exclude.o `test -f '${COMMON_DIR}/exclude.c' || echo '$(srcdir)/'`${COMMON_DIR}/exclude.c
+
+exclude.obj: ${COMMON_DIR}/exclude.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT exclude.obj -MD -MP -MF $(DEPDIR)/exclude.Tpo -c -o exclude.obj `if test -f '${COMMON_DIR}/exclude.c'; then $(CYGPATH_W) '${COMMON_DIR}/exclude.c'; else $(CYGPATH_W) '$(srcdir)/${COMMON_DIR}/exclude.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/exclude.Tpo $(DEPDIR)/exclude.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='${COMMON_DIR}/exclude.c' object='exclude.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o exclude.obj `if test -f '${COMMON_DIR}/exclude.c'; then $(CYGPATH_W) '${COMMON_DIR}/exclude.c'; else $(CYGPATH_W) '$(srcdir)/${COMMON_DIR}/exclude.c'; fi`
 
 ui.o: ${COMMON_DIR}/ui.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT ui.o -MD -MP -MF $(DEPDIR)/ui.Tpo -c -o ui.o `test -f '${COMMON_DIR}/ui.c' || echo '$(srcdir)/'`${COMMON_DIR}/ui.c
