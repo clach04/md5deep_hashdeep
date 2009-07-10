@@ -265,8 +265,7 @@ memset(VAR,0,SIZE * sizeof(TYPE));
 #define mode_excludes          1<<23
 #define mode_single_fs         1<<24
 
-
-// Modes 25-48 are reserved for future use.
+// Modes 26-48 are reserved for future use.
 //
 // Note that the LL is required to avoid overflows of 32-bit words.
 // LL must be used for any value equal to or above 1<<31. 

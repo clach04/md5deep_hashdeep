@@ -130,7 +130,7 @@ static int process_command_line(state *s, int argc, char **argv)
   
   while ((i = getopt(argc,
 		     argv,
-		     "I:i:M:X:x:m:d:o:A:a:tnwczsSp:efrhvV0lbkqU")) != -1) { 
+		     "I:i:M:X:x:m:d:o:A:a:tnwczsSp:eFrhvV0lbkqU")) != -1) { 
     switch (i) {
 
     case 'I':
@@ -250,7 +250,8 @@ static int process_command_line(state *s, int argc, char **argv)
       s->mode |= mode_estimate;
       break;
 
-    case 'f':
+      // RBF - Document -F mode
+    case 'F':
       s->mode |= mode_single_fs;
       break;
 
