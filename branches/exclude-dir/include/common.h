@@ -339,7 +339,7 @@ int done_processing_dir(TCHAR *fn);
 // ----------------------------------------------------------------
 // EXCLUDE FUNCTIONS
 // ----------------------------------------------------------------
-void add_exclude_dir(state *s, char *fn);
+int add_exclude_dir(state *s, char *fn);
 int exclude_dir(TCHAR *fn);
 
 // ------------------------------------------------------------------

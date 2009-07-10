@@ -40,18 +40,26 @@ static void dump_exclude(void)
 */
 
 
-void add_exclude_dir(state *s, char *fn)
+int add_exclude_dir(state * s, char  * fn)
 {
-  if (NULL == fn)
-    return;
+  if (NULL == s || NULL == fn)
+    return TRUE;
 
   exclude_table *new, *temp;
   TCHAR *d_name = (TCHAR *)malloc(sizeof(TCHAR) * PATH_MAX);
 
 #ifdef _WIN32
-  int t_size = MultiByteToWideChar(CP_ACP,0,fn,lstrlenA(fn),0,0);
-  TCHAR *t_name = (TCHAR *)malloc(sizeof(TCHAR) * (t_size + 1));
-  MultiByteToWideChar(CP_ACP,0,fn,lstrlenA(fn),t_name,t_size);
+  // We have to convert the user's parameter, a char value, into a 
+  // Unicode TCHAR value. We assume that we can only handle parameters
+  // as long as PATH_MAX, regardless of what the user gave us.
+  TCHAR * t_name = (TCHAR *)malloc(sizeof(TCHAR) * PATH_MAX);
+  if (NULL == t_name)
+    return TRUE;
+
+  int t_size = MultiByteToWideChar(CP_ACP,0,fn,lstrlenA(fn),t_name,PATH_MAX);
+  if (0 == t_size)
+    return TRUE;
+
   t_name[t_size] = 0;
   _wfullpath(d_name,t_name,PATH_MAX);
   free(t_name);
@@ -59,6 +67,7 @@ void add_exclude_dir(state *s, char *fn)
   realpath(fn,d_name);
 #endif
 
+  // If there is nothing in the list, add the first entry
   if (my_exclude == NULL)
   {
     my_exclude = (exclude_table*)malloc(sizeof(exclude_table));
@@ -66,10 +75,14 @@ void add_exclude_dir(state *s, char *fn)
     my_exclude->next = NULL;
 
     free(d_name);
-    return;
+    return FALSE;
   }
 
-  for(temp = my_exclude; temp->next; temp = temp->next);
+  // Advance to the end of the current list
+  temp = my_exclude;
+  while (temp->next != NULL)
+    temp = temp->next;
+  //  for (temp = my_exclude; temp->next ; temp = temp->next);
 
   new = (exclude_table*)malloc(sizeof(exclude_table));
   new->name = _tcsdup(d_name);
@@ -77,7 +90,7 @@ void add_exclude_dir(state *s, char *fn)
   temp->next = new;
 
   free(d_name);
-  return;
+  return FALSE;
 }
 
 

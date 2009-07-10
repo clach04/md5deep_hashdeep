@@ -219,8 +219,10 @@ static int process_command_line(state *s, int argc, char **argv)
       break;
 
     case 'd':
-      add_exclude_dir(s,optarg);
-      s->mode |= mode_excludes;
+      if (add_exclude_dir(s,optarg))
+	print_error(s, "Unable to exclude directory: %s", optarg);
+      else
+	s->mode |= mode_excludes;
       break;
 
     case 'c':
