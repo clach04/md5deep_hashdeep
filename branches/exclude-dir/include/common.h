@@ -264,6 +264,7 @@ memset(VAR,0,SIZE * sizeof(TYPE));
 #define mode_csv               1<<22
 #define mode_excludes          1<<23
 #define mode_single_fs         1<<24
+#define mode_read_from_file    1<<25
 
 // Modes 26-48 are reserved for future use.
 //
