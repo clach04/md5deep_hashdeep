@@ -1,0 +1,16 @@
+*** Update trove descriptions and other sf.net text to include hashdeep
+
+*** Edit md5deep web page
+    - Describe hashdeep in the introduction
+
+*** Create unit test directive/code
+
+*** Write hashdeep quickstart guide
+
+*** Create FAQ
+  - Why nothing happens when I double click it
+  - Why is this better than one line of shell
+
+*** Add support for hashdeep to use NSRL files and other types?
+
+*** Add timestamp mode (-t) to hashdeep
