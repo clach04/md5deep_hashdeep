@@ -13,7 +13,6 @@
 # define __MSVCRT_VERSION__ 0x0601
 #endif
 
-
 // The version information, VERSION, is defined in config.h 
 
 #define AUTHOR      "Jesse Kornblum"
@@ -129,6 +128,9 @@ NEWLINE, NEWLINE, NEWLINE
 #define MAX_STRING_LENGTH    2048
 
 #define MAX_TIME_STRING_LENGTH  31
+
+// This denotes when we don't know the file size.
+#define UNKNOWN_FILE_SIZE  -1
 
 // LINE_LENGTH is different between UNIX and WIN32 and is defined below 
 #define MAX_FILENAME_LENGTH   LINE_LENGTH - 41
@@ -291,7 +293,8 @@ memset(VAR,0,SIZE * sizeof(TYPE));
 
 
 // These are the types of files we can encounter while hashing 
-
+// Note these will be stored in a uint8_t, so should be between
+// zero and 255.
 #define stat_regular    0
 #define stat_directory  1
 #define stat_door       2
@@ -345,6 +348,8 @@ int exclude_dir(TCHAR *fn);
 // ------------------------------------------------------------------
 // HELPER FUNCTIONS
 // ------------------------------------------------------------------ 
+void setup_expert_mode(state *s, char *arg);
+
 void generate_filename(state *s, TCHAR *fn, TCHAR *cwd, TCHAR *input);
 
 uint64_t find_block_size(state *s, char *input_str);

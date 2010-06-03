@@ -317,7 +317,6 @@ static int is_junction_point(state *s, TCHAR *fn)
   return status;
 }
 
-// RBF - Remove experimental code?
 // This is experimental code for reparse point process
 // We don't use it yet, but I don't want to delete it
 // until I know what I'm doing. (jk 1 Mar 2009)
@@ -464,7 +463,6 @@ static int file_type_helper(_tstat_t sb)
     return stat_symlink;  
 #endif   // ifndef _WIN32 
 
-
   // Used to detect Solaris doors 
 #ifdef S_IFDOOR
 #ifdef S_ISDOOR
@@ -609,8 +607,8 @@ static int should_hash(state *s, TCHAR *fn)
 
   // We must reset the number of bytes in each file processed
   // so that we can tell if fstat reads the number successfully
-  s->total_bytes = 0;
-  s->timestamp = 0;
+  s->total_bytes = UNKNOWN_FILE_SIZE;
+  s->timestamp   = 0;
 
   type = file_type(s,fn);
   

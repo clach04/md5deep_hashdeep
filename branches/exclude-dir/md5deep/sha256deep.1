@@ -1,4 +1,4 @@
-.TH MD5DEEP "1" "v3.4 \- 11 Jun 2009" "AFOSI" "United States Air Force"
+.TH MD5DEEP "1" "v3.6 \- 23 Mar 2010" "AFOSI" "United States Air Force"
 
 .SH NAME
 md5deep \- Compute and compare MD5 message digests
@@ -16,7 +16,7 @@ whirlpooldeep \- Compute and compare Whirlpool message digests
 -v | -V | -h
 .br
 .B md5deep
-[\-m|\-M|\-x|\-X <file>]  [-a|-A <hash>]
+[\-m|\-M|\-x|\-X <file>]  [-a|-A <hash>] [\-f <file>]
 [\-p <size>] [\-i <size>] [\-tnwzresS0lbkq] [\-o <fbcplsd>] [\fBFILES\fR]
 
 .SH DESCRIPTION
@@ -109,6 +109,13 @@ This flag may not be used in conjunction with the \-x, \-X, or \-A flags.
 \fB\-A\fR <hash>
 Same as \-a above, but does negative matching.
 This flag may not be used in conjunction with the \-m, \-M, or \-A flags.
+
+.TP
+\fB\-f\fR <file>
+Takes a list of files to be hashed from the specified file. Each
+line is assumed to be a filename. This flag can only be used once
+per invocation. If it's used a second time, the second instance will
+clobber the first.
 
 .TP
 \fB\-w\fR
@@ -248,7 +255,7 @@ be reported to the developer! See the section "Reporting Bugs" below.
 
 
 .SH AUTHOR
-md5deep was written by Jesse Kornblum, md5deep [at] jessekornblum [dot] com.
+md5deep was written by Jesse Kornblum, research [at] jessekornblum [dot] com.
 
 .SH KNOWN ISSUES
 Using the \-r flag cannot be used to recursively process all files 
@@ -261,8 +268,7 @@ forensic integrity of this program could have serious consequenses on
 people's lives. When submitting a bug report, please include a description
 of the problem, how you found it, and your contact information.
 .PP
-Send bug reports to:
-md5deep [at] jessekornblum [dot] com
+Send bug reports to the author at the address above.
 
 .PP
 .SH COPYRIGHT

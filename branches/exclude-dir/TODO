@@ -1,10 +1,6 @@
-*** Create FAQ
-  - Why nothing happens when I double click it
-  - Why is this better than one line of shell
+Because I kept ignoring this list of TODO items, I have 
+moved them all to the SourceForge Feature Request Tracker.
+See https://sourceforge.net/tracker/?group_id=67079&atid=516781
+for all current TODO items.
 
-*** Add support for hashdeep to use NSRL files and other types?
-
-*** Add timestamp mode (-t) to hashdeep
-
-*** Add 'make test' directive to run compiled programs on test files 
-    and ensure compilation was successful. 
+$Id$

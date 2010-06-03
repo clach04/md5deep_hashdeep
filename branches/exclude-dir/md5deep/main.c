@@ -55,34 +55,6 @@ static void usage(void)
 }
 
 
-static void setup_expert_mode(state *s, char *arg)
-{
-  unsigned int i = 0;
-
-  while (i < strlen(arg)) {
-    switch (*(arg+i)) {
-    case 'b': // Block Device
-      s->mode |= mode_block;     break;
-    case 'c': // Character Device
-      s->mode |= mode_character; break;
-    case 'p': // Named Pipe
-      s->mode |= mode_pipe;      break;
-    case 'f': // Regular File
-      s->mode |= mode_regular;   break;
-    case 'l': // Symbolic Link
-      s->mode |= mode_symlink;   break;
-    case 's': // Socket
-      s->mode |= mode_socket;    break;
-    case 'd': // Door (Solaris)
-      s->mode |= mode_door;      break;
-    default:
-      print_error(s,"%s: Unrecognized file type: %c",__progname,*(arg+i));
-    }
-    ++i;
-  }
-}
-
-
 static void check_flags_okay(state *s)
 {
   sanity_check(s,
@@ -329,6 +301,69 @@ static int prepare_windows_command_line(state *s)
   return FALSE;
 }
 #endif
+
+
+int process_input_list(state *s)
+{
+  TCHAR * t_name;
+  int done = FALSE;
+  FILE * handle = fopen(s->input_list,"rb");
+  char * fn;
+
+  t_name = (TCHAR *)malloc(sizeof(TCHAR) * PATH_MAX);
+  if (NULL == t_name)
+    return TRUE;
+
+  if (NULL == handle)
+  {
+    perror(s->input_list);
+    return TRUE;
+  }
+
+  fn = (char *)malloc(MAX_STRING_LENGTH * sizeof(char));
+  if (NULL == fn)
+  {
+    fclose(handle);
+    return TRUE;
+  }
+
+  while (!done)
+  {
+    if (NULL == fgets(fn, MAX_STRING_LENGTH, handle))
+    {
+      done = TRUE;
+    }
+    else
+    {
+      chop_line(fn);
+
+#ifdef _WIN32
+      // We have to convert value from the file, a char value, into a 
+      // Unicode TCHAR value. We assume that we can only handle parameters
+      // as long as PATH_MAX, regardless of what the user gave us.
+      int t_size = MultiByteToWideChar(CP_ACP,
+				       0,
+				       fn,
+				       lstrlenA(fn),
+				       t_name,
+				       PATH_MAX);
+      if (0 == t_size)
+	return TRUE;
+
+      t_name[t_size] = 0;
+
+      process_win32(s,t_name);
+#else
+      process_normal(s,fn);
+#endif
+    }
+  }
+
+  free(t_name);
+  free(fn);
+  fclose(handle);
+  return FALSE;
+}
 
 
 int main(int argc, char **argv) 

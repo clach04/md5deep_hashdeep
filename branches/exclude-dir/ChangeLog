@@ -1,3 +1,110 @@
+2010-06-03 Eddie Atherton
+
+        * Added -d option to add directories to be excluded when
+          scanning recursivly.
+
+        * Added -f option to restrict recursive directory scan to
+          current filesystem.
+
+
+2010-03-23 Jesse Kornblum
+
+	* Version bump to 3.6 and release
+
+	* Documented expert mode in hashdeep man page, getting started
+	  guide. Also made a few tweaks to the md5deep documentation.
+
+	* Added some error checking routines to helpers
+	
+
+2010-03-06 Jesse Kornblum
+
+	* Cleaned up md5deep/main.h comment styles. Also added a field
+	  to the state variable to keep track of the file's type. This
+	  is was handy for...
+
+	* Updating file size computation to use results of stat 
+	  operation normally done anyway during dig phase.
+	
+
+2010-02-26 Jesse Kornblum
+
+	* Adding 'expert' mode from md5deep to hashdeep.
+	
+
+2010-02-25 Jesse Kornblum
+
+	* Changed all contact email addresses to research account at
+	  jessekornblum.com. The 'md5deep' account will be deprecated.
+	
+
+2010-01-09 Jesse Kornblum
+
+	* Finished updating download links. Updated and published
+	  Hashdeep quick start guide
+
+	
+2009-12-30 Jesse Kornblum
+
+	* Converting documentation update to use rsync+ssh to upload content
+	
+
+2009-12-29 Jesse Kornblum
+
+	* Version bump to 3.5.1
+
+	* Attempting to fix bug 2922415 involving zero byte files
+
+	* Added a few items to the TODO list
+
+	* Started web page cleanup
+
+
+2009-12-21 Jesse Kornblum
+
+	* Attempting to fix bug 2919014 regarding hashdeep and its
+	  failure to detect when files go missing during an audit
+	  if there is another, identical file in a different location
+
+	* Cleanup on md5deep code for -f mode
+
+	* Revised list of new features for release 3.5
+
+
+2009-09-24 Jesse Kornblum
+
+	* Again revised patch 2855502 to handle the last read of
+	  files/stdin when no data is read. This happens when the
+	  file size is an exact multiple of the piecewise size.
+	
+
+2009-09-16 Jesse Kornblum
+
+	* Updated broken link on web page for Whirlpool.
+	
+
+2009-09-09 Jesse Kornblum
+
+	* Applied a modified version of patch 2855502 to fix file size 
+	  computation for piecewise hashing of stdin.
+	
+
+2009-07-11 Jesse Kornblum
+
+	* Added draft of Hashdeep Getting Started guide
+	
+
+2009-07-10 Jesse Kornblum
+
+	* Fixed method to read list of files to hash from a file.
+	
+
+2009-06-14 Jesse Kornblum 
+
+	* Experimenting with reading list of files to hash from another
+	  file in md5deep.
+	
+
 2009-05-22 Jesse Kornblum 
 
 	* Closed search handle in is_junction_point in response
@@ -7,23 +114,11 @@
 	  for NULL parameters.
 
 	
-2009-04-12 Eddie Atherton
-
-	* Added -f option to restrict recursive directory scan to 
-	  current filesystem.
-
-	
 2009-04-10 Jesse Kornblum 
 
 	* Experimenting with stopping file read on "Invalid argument" errors
 	  to avoid crashes on Win32.
 
-2009-04-10 Eddie Atherton
-
-	* Added -d option to add directories to be excluded when 
-	  scanning recursivly.
-
-	
 
 2009-04-04 Jesse Kornblum 
 

@@ -123,8 +123,8 @@ static void shorten_filename(TCHAR *dest, TCHAR *src)
   if (NULL == basen)
     return;
 
-  // RBF - Check the return value of my_basename
-  my_basename(basen);  
+  if (my_basename(basen))
+    return;
 
   if (_tcslen(basen) < MAX_FILENAME_LENGTH)
   {
@@ -265,6 +265,7 @@ static int hash(state *s)
 {
   int done = FALSE, status = FALSE;
   TCHAR *tmp_name = NULL;
+  uint64_t start_offset;
   
   if (NULL == s)
     return TRUE;
@@ -297,47 +298,53 @@ static int hash(state *s)
 #endif
     HASH_INITIALIZE();
     
-    if (s->mode & mode_piecewise)
-    {
-      // This logic keeps the offset values correct when s->block_size
-      // is larger than the whole file. 
-      if (s->bytes_read + s->block_size >  s->total_bytes)
-	_sntprintf(s->full_name,PATH_MAX,_TEXT("%s offset %"PRIu64"-%"PRIu64),
-		  tmp_name, s->bytes_read, s->total_bytes);
-      else
-	_sntprintf(s->full_name,PATH_MAX,_TEXT("%s offset %"PRIu64"-%"PRIu64),
-		  tmp_name, s->bytes_read, s->bytes_read + s->block_size);
-    }
-    
+    start_offset = s->bytes_read;
+
     if (!compute_hash(s))
     {
       if (s->mode & mode_piecewise)
 	free(s->full_name);
       return TRUE;
     }
+
+    // We should only display a hash if we've processed some
+    // data during this read OR if the whole file is zero bytes long.
+    // If the file is zero bytes, we won't have read anything, but
+    // still need to display a hash.
+    if (start_offset != s->bytes_read || 0 == s->total_bytes)
+    {
+      if (s->mode & mode_piecewise)
+      {
+	if (0 == s->total_bytes)
+	  _sntprintf(s->full_name,PATH_MAX,_TEXT("%s offset 0"),tmp_name);
+	else
+	  _sntprintf(s->full_name,PATH_MAX,_TEXT("%s offset %"PRIu64"-%"PRIu64),
+		     tmp_name, start_offset, s->bytes_read - 1);
+      }
       
-    HASH_FINALIZE();
+      HASH_FINALIZE();
 
 #ifdef __MD5DEEP_H
-    static char hex[] = "0123456789abcdef";
-    size_t i;
-
-    for (i = 0; i < s->hash_length ; ++i) 
-    {
-      s->hash_result[2 * i] = hex[(s->hash_sum[i] >> 4) & 0xf];
-      s->hash_result[2 * i + 1] = hex[s->hash_sum[i] & 0xf];
-    }
-
-    // Under not matched mode, we only display those known hashes that
-    // didn't match any input files. Thus, we don't display anything now.
-    // The lookup is to mark those known hashes that we do encounter
-    if (s->mode & mode_not_matched)
-      is_known_hash(s->hash_result,NULL);
-    else
-      status = display_hash(s);
+      static char hex[] = "0123456789abcdef";
+      size_t i;
+      
+      for (i = 0; i < s->hash_length ; ++i) 
+      {
+	s->hash_result[2 * i] = hex[(s->hash_sum[i] >> 4) & 0xf];
+	s->hash_result[2 * i + 1] = hex[s->hash_sum[i] & 0xf];
+      }
+      
+      // Under not matched mode, we only display those known hashes that
+      // didn't match any input files. Thus, we don't display anything now.
+      // The lookup is to mark those known hashes that we do encounter
+      if (s->mode & mode_not_matched)
+	is_known_hash(s->hash_result,NULL);
+      else
+	status = display_hash(s);
 #else
-    display_hash(s);
+      display_hash(s);
 #endif    
+    }
 
     if (s->mode & mode_piecewise)
       done = feof(s->handle);
@@ -398,12 +405,14 @@ int hash_file(state *s, TCHAR *fn)
 
   if ((s->handle = _tfopen(fn,_TEXT("rb"))) != NULL)
   {
-    // We only call the fstat or the ioctl functions if we weren't able to 
-    // determine the file size from the stat function in dig.c:file_type().
-    if (0 == s->total_bytes)
+    // We should have the file size already from the stat functions
+    // called during digging. If for some reason that failed, we'll
+    // try some ioctl calls now to get the full size.
+    if (UNKNOWN_FILE_SIZE == s->total_bytes)
       s->total_bytes = find_file_size(s->handle);
 
-    if (s->mode & mode_size && s->total_bytes > s->size_threshold)
+    // If this file is above the size threshold set by the user, skip it
+    if ((s->mode & mode_size) && (s->total_bytes > s->size_threshold))
     {
       if (s->mode & mode_size_all)
       {
@@ -432,7 +441,6 @@ int hash_file(state *s, TCHAR *fn)
 
     if (s->mode & mode_estimate)
     {
-      // The find file size returns a value of type off_t, so we must cast it
       s->total_megs = s->total_bytes / ONE_MEGABYTE;
       shorten_filename(s->short_name,s->full_name);    
     }    

@@ -14,6 +14,34 @@
 
 #include "main.h"
 
+void setup_expert_mode(state *s, char *arg)
+{
+  unsigned int i = 0;
+
+  while (i < strlen(arg)) {
+    switch (*(arg+i)) {
+    case 'b': // Block Device
+      s->mode |= mode_block;     break;
+    case 'c': // Character Device
+      s->mode |= mode_character; break;
+    case 'p': // Named Pipe
+      s->mode |= mode_pipe;      break;
+    case 'f': // Regular File
+      s->mode |= mode_regular;   break;
+    case 'l': // Symbolic Link
+      s->mode |= mode_symlink;   break;
+    case 's': // Socket
+      s->mode |= mode_socket;    break;
+    case 'd': // Door (Solaris)
+      s->mode |= mode_door;      break;
+    default:
+      print_error(s,"%s: Unrecognized file type: %c",__progname,*(arg+i));
+    }
+    ++i;
+  }
+}
+
+
 uint64_t find_block_size(state *s, char *input_str)
 {
   unsigned char c;
@@ -133,9 +161,13 @@ void generate_filename(state *s, TCHAR *fn, TCHAR *cwd, TCHAR *input)
 int my_basename(TCHAR *str)
 {
   size_t len;
-  TCHAR *tmp = _tcsrchr(str,DIR_SEPARATOR);
+  TCHAR *tmp;
 
-  if (NULL == tmp || NULL == str)
+  if (NULL == str)
+    return TRUE;
+
+  tmp  = _tcsrchr(str,DIR_SEPARATOR);
+  if (NULL == tmp)
     return TRUE;
 
   len = _tcslen(tmp);
@@ -427,7 +459,6 @@ off_t find_dev_size(int fd, int blk_size)
   off_t curr = 0, amount = 0;
   void *buf;
  
-  // RBF - How do we validate the file descriptor here?
   if (blk_size == 0)
     return 0;
   
@@ -475,6 +506,8 @@ off_t find_file_size(FILE *f)
   if (NULL == f)
     return 0;
 
+  // The error checking for this is above. If f is not NULL
+  // fd should be vald.
   int fd = fileno(f);
   struct stat sb;
   
@@ -505,6 +538,10 @@ off_t find_file_size(FILE *f)
   // 
   // TODO: Find a way to estimate device sizes on Windows
   // Perhaps an IOTCL_DISK_GET_DRIVE_GEOMETRY_EX would work? 
+
+  // RBF - We don't really have the fseeko and ftello functions
+  // on windows. They are functions like _ftelli64 or some such
+  // RBF - Fix find_file_size for large files on Win32
 
   if ((fseeko(f,0,SEEK_END)))
     return 0;
