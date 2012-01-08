@@ -1,3 +1,0 @@
-../testfiles/copying.txt
-../testfiles/deadbeef.txt
-../testfiles/dot_file_⦿.txt
