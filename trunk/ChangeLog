@@ -1,3 +1,7 @@
+2014-05-08  Jesse Kornblum  <research@jessekornblum.com>:
+
+	* doc/index.html: Updating to v4.4, GitHub development.
+
 2012-11-29  Jesse Kornblum  <research@jessekornblum.com>:
 
 	* src/dig.cpp: Experimental change to parse single instance storage (SIS) junction points.
