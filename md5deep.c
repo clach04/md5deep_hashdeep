@@ -417,8 +417,15 @@ void addMatchingFile(char *fn) {
 void processCommandLine(int argc, char **argv) {
 
   char i;
-  
-  while ((i=getopt(argc,argv,"m:serhvVbt")) != -1) { 
+
+#ifndef MD5DEEP_GETOPT_END
+    #ifdef __TOS_AIX__
+        #define MD5DEEP_GETOPT_END (255)
+    #else
+        #define MD5DEEP_GETOPT_END (-1)
+    #endif
+#endif
+  while ((i=getopt(argc,argv,"m:serhvVbt")) != MD5DEEP_GETOPT_END) {
     switch (i) {
 
     case 'm':
